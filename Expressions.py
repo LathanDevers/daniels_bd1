@@ -1,41 +1,53 @@
-#EXPRESSIONS
+#CONSTS
+ALL="ALL"
+
+#HERITAGE
 class Expr:
     def __init__(self, expr1):
         self.expr1=expr1
     def __str__(self):
         return str(self.expr1)
+    def getType(self):
+        return type(self.expr1)
     def sort(self):
-        pass
+        return ALL
+    
 #ATOMES
-class Attr:
+class Attr(Expr):
     def __init__(self, attr):
-        self.attr=attr
+        Expr.__init__(self, attr)
     def __str__(self):
-        return str(self.attr)
+        return str(self.expr1)
 
-class Rel:
+class Rel(Expr):
     def __init__(self, rel):
-        self.rel=rel
+        Expr.__init__(self, rel)
     def __str__(self):
-        return str(self.rel)
+        return str(self.expr1)
     def sort(self):
-        return None
+        return ALL
 
-class Const:
+class Const(Expr):
     def __init__(self, const):
-        self.const=const
+        Expr.__init__(self, const)
     def __str__(self):
-        return str(self.const)
+        return str(self.expr1)
 
+#EXPRESSIONS
 class Select(Expr):
     def __init__(self, expr1, expr2, expr3):
-        Expr.__init__(self, expr1)
-        self.expr2=expr2
-        self.expr3=expr3
+        if (expr3.sort()==ALL or str(expr1) in expr3.sort()) and expr1.getType()==expr2.getType():
+            Expr.__init__(self, expr1)
+            self.expr2=expr2
+            self.expr3=expr3
+        elif expr1.getType()!=expr2.getType():
+            print("error types : {} is {} and {} is {}".format(expr1, expr1.getType(), expr2, expr2.getType()))
+        else:
+            print("{} not in {}".format(expr1, expr2))
     def __str__(self):
-        return "(Select * from {} where {}={}) ".format(self.expr3, self.expr1, self.expr2)
+        return "(Select * from {} where {}={})".format(self.expr3, self.expr1, self.expr2)
     def sort(self):
-        return None
+        return self.expr3.sort()
 
 class Project(Expr):
     def __init__(self, attrs, expr1):
@@ -54,13 +66,15 @@ class Project(Expr):
         return sortL
 
 class Join(Expr):
-    pass
+    def __init__(self, expr1, expr2):
+        pass
 
 class Rename(Expr):
     pass
 
 class Union(Expr):
-    pass
+    def __init__(self, expr1, expr2):
+        pass
 
 class Diff(Expr):
     pass
