@@ -65,7 +65,13 @@ class Join(Expr):
         Expr.__init__(self, expr1)
         self.expr2=expr2
     def __str__(self):
-        return "("+str(self.expr1)+" union "+str(self.expr2)+")"
+        return "(select * from "+str(self.expr1)+" natural join "+str(self.expr2)+")"
+    def sort(self):
+        if self.expr1.sort()==ALL or self.expr2.sort()==ALL:
+            return ALL
+        else:
+            pass
+            
 
 class Rename(Expr):
     pass
