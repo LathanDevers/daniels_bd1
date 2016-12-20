@@ -44,7 +44,17 @@ class Expr:
         return str(self.expr1)
     def sort():
         return ALL
-    def validate():
+    def validate(attrNames):
+        return True
+    def find(n, tab):
+        for i in range(len(tab)):
+            if n==tab[i]:
+                return True
+        return False
+    def comp(tab1, tab2):
+        for i in range(len(tab1)):
+            if find(tab1[i], tab2)==False:
+                return False
         return True
     
 #ATOMES
@@ -59,10 +69,8 @@ class Rel(Expr):
         Expr.__init__(self, rel)
     def __str__(self):
         return str(self.expr1)
-    def setSort(attrs):
-        self.attrs=attrs
-    def sort():
-        return self.attrs
+    def sort(self):
+        return ALL
 
 class Const(Expr):
     def __init__(self, const):
@@ -77,11 +85,8 @@ class Select(Expr):
         self.expr2=expr2
         self.expr3=expr3
     def __str__(self):
-        if validate():
-            return "(select * from {} where {}={})".format(self.expr3, self.expr1, self.expr2)
-        else:
-            pass
-    def sort():
+        return "(select * from {} where {}={})".format(self.expr3, self.expr1, self.expr2)
+    def sort(self):
         return self.expr3.sort()
     def validate():
         for i in self.expr3.sort():
@@ -94,29 +99,16 @@ class Project(Expr):
         Expr.__init__(self, expr1)
         self.attrs=attrs
     def __str__(self):
-        if validate():
-            getStr="(select "
-            for i in range(len(self.attrs)-1):
-                getStr+=str(self.attrs[i])+", "
-            getStr+="{} from {})".format(self.attrs[-1], self.expr1)
-            return getStr
-        else:
-            pass
+        getStr="(select "
+        for i in range(len(self.attrs)-1):
+            getStr+=str(self.attrs[i])+", "
+        getStr+="{} from {})".format(self.attrs[-1], self.expr1)
+        return getStr
     def sort(self):
         sortL=[]
         for i in self.attrs:
             sortL.append(str(i))
         return sortL
-    def find(n, tab):
-        for i in range(len(tab)):
-            if n==tab[i]:
-                return True
-        return False
-    def comp(tab1, tab2):
-        for i in range(len(tab1)):
-            if find(tab1[i], tab2)==False:
-                return False
-        return True
     def validate():
         return comp(self.attrs, self.expr1.sort())
 
@@ -132,16 +124,16 @@ class Join(Expr):
             
 
 class Rename(Expr):
-    pass
+    def __init__(self, expr1, expr2, expr3):
+        pass
+    def __str__(self):
+        pass
 
 class Union(Expr):
     def __init__(self, expr1, expr2):
         pass
     def __str__(self):
-        if validate():
-            pass
-        else:
-            pass
+        pass
     def sort():
         return self.expr1.sort()
     def validate():
@@ -153,10 +145,7 @@ class Diff(Expr):
     def __init__(self, expr1, expr2):
         pass
     def __str__(self):
-        if validate():
-            pass
-        else:
-            pass
+        pass
     def sort():
         return self.expr1.sort()
     def validate():

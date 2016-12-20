@@ -1,11 +1,11 @@
-from Expressions import Expr
-from Expressions import Attr
-from Expressions import Select
-from Expressions import Rel
-from Expressions import Const
-from Expressions import Project
-from Expressions import Join
-from Expressions import Table
+from Expr2 import Expr
+from Expr2 import Attr
+from Expr2 import Select
+from Expr2 import Rel
+from Expr2 import Const
+from Expr2 import Project
+from Expr2 import Join
+from Expr2 import Table
 import sqlite3
 
 """print(Select(Attr("A1"), Const("Charles"), Rel("R1")))
@@ -15,18 +15,25 @@ print(Project([Attr("A1")], Rel("R1")).sort())
 print(Select(Attr("A1"), Const("Charles"), Rel("R1")).sort())
 print("\n")"""
 
-def SPJRUD2sqlite3(pathBD, command):
-    c=connexion(pathBD)
+def SPJRUD2sqlite3(pathDB, command):
+    c=connexion(pathDB)
     tables=createTables(c, retTables(c))
+    if(command.validation(tables)):
+        #printTables(pathDB)
+        print(str(command)[1:-1])
+        command.display()
     
-    retCommand=str(command)[1:-1]
-    return retCommand
+        retCommand=str(command)[1:-1]
+        return retCommand
+
+def createTable(command, tables):
+    print(command.sort())
 
 def printTables(pathDB):
     c=connexion(pathDB)
     tables=createTables(c, retTables(c))
     for i in range(len(tables)):
-        print(tables[i])
+        tables[i].display()
 
 def retTables(c):
     tables=c.execute("select name from sqlite_master where type='table';").fetchall()
@@ -79,6 +86,6 @@ def createTables(c, tables):
         name=tables[i]
         attrNames=attributes[i][0]
         attrTypes=attributes[i][1]
-        attrs=[c.execute("select * from {}".format(name)).fetchall()]
+        attrs=c.execute("select * from {}".format(name)).fetchall()
         retTables+=[Table(name, attrNames, attrTypes, attrs)]
     return retTables
