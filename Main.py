@@ -61,19 +61,19 @@ def connexion(path):
     conn=sqlite3.connect(path)
     c=conn.cursor()
     """c.execute("drop table R1")
-    c.execute('''create table R1(A1 text, A2 float, A3 real)''')
+    c.execute('''create table R1(A1 text, A2 real, A3 real)''')
     c.execute("insert into R1 values('Charles', 3, 20)")
     c.execute("insert into R1 values('Maxime', 20, 20)")
     c.execute("insert into R1 values('Guillaume', 3, 5)")
 
     c.execute("drop table R2")
-    c.execute('''create table R2(A4 real, A2 float, A5 text)''')
+    c.execute('''create table R2(A4 real, A2 real, A5 text)''')
     c.execute("insert into R2 values(123, 1, 'ALLE')")
     c.execute("insert into R2 values(124, 2, 'RADAR')")
     c.execute("insert into R2 values(126, 3, 'BIS')")
 
     c.execute("drop table R3")
-    c.execute('''create table R3(E1 real, E2 float, A5 text)''')
+    c.execute('''create table R3(E1 real, E2 real, A5 text)''')
     c.execute("insert into R3 values(15, 20, 'BON')")
     c.execute("insert into R3 values(18, 20, 'TRESBON')")
     c.execute("insert into R3 values(3, 20, 'MAUVAIS')")"""

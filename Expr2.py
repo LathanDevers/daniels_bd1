@@ -9,6 +9,10 @@ class Table:
         for i in range(len(self.attrNames)):
             if attribute==self.attrNames[i]:
                 return self.attrTypes[i]
+    def getUnit(self, attrName):
+        for i in range(len(self.attrNames)):
+            if attrName==self.attrNames[i]:
+                return i
     def display(self):
         ret=""
         ret+=self.name
@@ -66,10 +70,11 @@ class Rel(Expr):
 class Const:
     def __init__(self, value):
         self.value=value
+        self.atk=0
     def __str__(self):
         return str(self.value)
     def getType(self):
-        if type(self.value)==type(10):
+        if type(self.value)==type(10.0):
             return "real"
         if type(self.value)==type(""):
             return "text"
@@ -77,13 +82,14 @@ class Const:
 class Attr:
     def __init__(self, name):
         self.name=name
+        self.atk=1
         
 #Expressions
 class Select(Expr):
-    def __init__(self, attr, const, expr1):
+    def __init__(self, attr, comp, expr1):
         Expr.__init__(self)
         self.attr=attr
-        self.const=const
+        self.comp=comp
         self.expr1=expr1
         self.table=[]
     def validation(self, tables):
@@ -91,27 +97,48 @@ class Select(Expr):
         self.expr1.validation(tables)
         self.table=self.expr1.table
         try:
-            if self.attr.name in self.expr1.table.attrNames and self.table.getType(self.attr.name)==self.const.getType():
-                new_attrs=[]
-                for i in range(len(self.table.attrNames)):
-                    if self.attr.name==self.table.attrNames[i]:
-                        for j in range(len(self.table.attrs)):
-                            if self.table.attrs[j][i]==self.const.value:
-                                new_attrs+=[self.table.attrs[j]]
-                self.table.attrs=new_attrs
-                return True
-            elif (self.attr.name in self.expr1.table.attrNames)==False:
-                print("ERROR AT SELECT ATTRIBUTE {} NOT IN {}".format(self.attr.name, self.expr1.table.attrNames))
-                return False
-            elif self.table.getType(self.attr.name)!=self.const.getType():
-                print("ERROR CONST {} TYPE {} IS NOT TYPE {}".format(self.const.value, self.const.getType(), self.table.getType(self.attr.name)))
-                return False
+            if self.comp.atk==0:
+                if self.attr.name in self.expr1.table.attrNames and self.table.getType(self.attr.name)==self.comp.getType():
+                    new_attrs=[]
+                    i=self.table.getUnit(self.attr.name)
+                    for j in range(len(self.table.attrs)):
+                        if self.table.attrs[j][i]==self.comp.value:
+                            new_attrs+=[self.table.attrs[j]]
+                    self.table.attrs=new_attrs
+                    return True
+                elif (self.attr.name in self.expr1.table.attrNames)==False:
+                    print("ERROR AT SELECT ATTRIBUTE {} NOT IN {}".format(self.attr.name, self.expr1.table.attrNames))
+                    print("Select( Attr({}), Const({}), Rel({}))".format(self.attr.name, self.comp, self.expr1.name))
+                    return False
+                elif self.table.getType(self.attr.name)!=self.const.getType():
+                    print("ERROR CONST {} TYPE {} IS NOT TYPE {}".format(self.comp.value, self.comp.getType(), self.table.getType(self.attr.name)))
+                    return False
+            elif self.comp.atk==1:
+                if self.attr.name in self.expr1.table.attrNames and self.comp.name in self.expr1.table.attrNames and self.table.getType(self.attr.name)==self.table.getType(self.comp.name):
+                    new_attrs=[]
+                    i=self.table.getUnit(self.attr.name)
+                    i2=self.table.getUnit(self.comp.name)
+                    for j in range(len(self.table.attrs)):
+                        if self.table.attrs[j][i]==self.table.attrs[j][i2]:
+                            new_attrs+=[self.table.attrs[j]]
+                    self.table.attrs=new_attrs
+                    return True
+                elif (self.attr.name in self.expr1.table.attrNames)==False:
+                    print("ERROR AT SELECT ATTRIBUTE {} NOT IN {}".format(self.attr.name, self.expr1.table.attrNames))
+                    print("Select( Attr({}), Const({}), Rel({}))".format(self.attr.name, self.comp, self.expr1.name))
+                    return False
+                elif self.table.getType(self.attr.name)!=self.const.getType():
+                    print("ERROR CONST {} TYPE {} IS NOT TYPE {}".format(self.comp.value, self.comp.getType(), self.table.getType(self.attr.name)))
+                    return False
         except:
             pass
     def display(self):
         self.expr1.table.display()
-    def __str__(self):
-        return '(select * from {} where {}={})'.format(self.expr1, self.attr.name, self.const.value)
+    def __str__(self):#TODO changer str en traduction et mettre str Select(...)
+        if self.comp.atk==0:
+            return '(select * from {} where {}={})'.format(self.expr1, self.attr.name, self.comp.value)
+        elif self.comp.atk==1:
+            return '(select * from {} where {}={})'.format(self.expr1, self.attr.name, self.comp.name)
         
 class Project:
     def __init__(self, attrs, expr1):
@@ -133,6 +160,10 @@ class Project:
                         if self.db_attrs[i]==self.table.attrNames[j]:
                             tag+=[j]
                 new_attrs=[]
+                new_types=[]
+                for i in tag:
+                    new_types+=self.table.attrTypes[i]
+                self.table.attrTypes=new_types
                 for i in range(len(self.table.attrs)):
                     new_attr1=[]
                     for j in tag:
@@ -158,18 +189,42 @@ class Project:
         
 class Join:
     def __init__(self, expr1, expr2):
+        self.db_attrs=[]
         self.expr1=expr1
         self.expr2=expr2
         Expr.__init__(self)
-    def validation(self, db_attrs):
-        #self.expr1.validation(db_attrs)
-        #self.expr2.validation(db_attrs)
-        self.db_attrs=self.expr1.db_attrs+self.expr2.db_attrs
-        Expr.validation(self, self.db_attrs)
+    def validation(self, tables):
+        Expr.validation(self, tables)
+        self.expr1.validation(tables)
+        self.expr2.validation(tables)
+        attrComm=[]
+        for i in range(len(self.expr1.table.attrNames)):
+            for j in range(len(self.expr2.table.attrNames)):
+                if self.expr1.table.attrNames[i]==self.expr2.table.attrNames[j]:
+                    attrComm+=[self.expr1.table.attrNames[i]]
+        for i in range(len(attrComm)):
+            if self.expr1.table.getType(attrComm[i])!=self.expr1.table.getType(attrComm[i]):
+                print("Error in JOIN SECTION : {} TYPE {} NOT COMPATIBLE WITH {} TYPE {}".format(attrComm[i], self.expr1.table.getType(attrComm[i]), attrComm[i], self.expr2.table.getType(attrComm[i])))
+                return False
+        newAttrsNames=self.expr1.table.attrNames+self.expr2.table.attrNames
+        print(newAttrsNames)
+        print(attrComm)
+        for i in range(len(attrComm)):
+            newAttrsNames.remove(attrComm[i])
+        print(newAttrsNames)
+        newAttrs=[]
+        newTypes=[]
+        return True
+    def __str__(self):
+        return "(select * from {} natural join select * from {})".format(self.expr1, self.expr2)
+    def display(self):
+        self.table.display()
         
 class Rename:
     def __init__(self, expr1, expr2, expr3):
-        pass
+        self.expr1=expr1
+        self.expr2=expr2
+        self.expr3=expr3
  
 class Union:
     def __init__(self, expr1, expr2):
