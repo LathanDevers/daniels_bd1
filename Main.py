@@ -6,6 +6,7 @@ from Expr2 import Const
 from Expr2 import Project
 from Expr2 import Join
 from Expr2 import Table
+from Expr2 import Rename
 import sqlite3
 
 """print(Select(Attr("A1"), Const("Charles"), Rel("R1")))
@@ -20,11 +21,10 @@ def SPJRUD2sqlite3(pathDB, command):
     tables=createTables(c, retTables(c))
     if(command.validation(tables)):
         #printTables(pathDB)
-        print(str(command)[1:-1])
-        command.display()
-    
         retCommand=str(command)[1:-1]
-        return retCommand
+        for i in range(len(c.execute(retCommand).fetchall())):
+            command.table.attrs+=[c.execute(retCommand).fetchall()[i]]
+        command.display()
 
 def createTable(command, tables):
     print(command.sort())
@@ -86,6 +86,6 @@ def createTables(c, tables):
         name=tables[i]
         attrNames=attributes[i][0]
         attrTypes=attributes[i][1]
-        attrs=c.execute("select * from {}".format(name)).fetchall()
-        retTables+=[Table(name, attrNames, attrTypes, attrs)]
+        #attrs=c.execute("select * from {}".format(name)).fetchall()
+        retTables+=[Table(name, attrNames, attrTypes)]#, attrs)]
     return retTables
