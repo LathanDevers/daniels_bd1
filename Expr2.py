@@ -75,7 +75,7 @@ class Const:
     def __str__(self):
         return str(self.value)
     def getType(self):
-        if type(self.value)==type(10.0):
+        if type(self.value)==type(10.0) or type(self.value)==type(10):
             return "real"
         if type(self.value)==type(""):
             return "text"
@@ -114,27 +114,18 @@ class Select(Expr):
                     print("ERROR AT SELECT ATTRIBUTE {} NOT IN {}".format(self.attr.name, self.expr1.table.attrNames))
                     print("Select( Attr({}), Const({}), Rel({}))".format(self.attr.name, self.comp, self.expr1.name))
                     return False
-                elif self.table.getType(self.attr.name)!=self.const.getType():
+                elif self.table.getType(self.attr.name)!=self.comp.getType():
                     print("ERROR CONST {} TYPE {} IS NOT TYPE {}".format(self.comp.value, self.comp.getType(), self.table.getType(self.attr.name)))
                     return False
             elif self.comp.atk==1:
                 if self.attr.name in self.expr1.table.attrNames and self.comp.name in self.expr1.table.attrNames and self.table.getType(self.attr.name)==self.table.getType(self.comp.name):
-                    """
-                    new_attrs=[]
-                    i=self.table.getUnit(self.attr.name)
-                    i2=self.table.getUnit(self.comp.name)
-                    for j in range(len(self.table.attrs)):
-                        if self.table.attrs[j][i]==self.table.attrs[j][i2]:
-                            new_attrs+=[self.table.attrs[j]]
-                    self.table.attrs=new_attrs
-                    """
                     return True
                 elif (self.attr.name in self.expr1.table.attrNames)==False:
                     print("ERROR AT SELECT ATTRIBUTE {} NOT IN {}".format(self.attr.name, self.expr1.table.attrNames))
                     print("Select( Attr({}), Const({}), Rel({}))".format(self.attr.name, self.comp, self.expr1.name))
                     return False
-                elif self.table.getType(self.attr.name)!=self.const.getType():
-                    print("ERROR CONST {} TYPE {} IS NOT TYPE {}".format(self.comp.value, self.comp.getType(), self.table.getType(self.attr.name)))
+                elif self.table.getType(self.attr.name)!=self.table.getType(self.comp.name):
+                    print("ERROR ATTR {} TYPE {} IS NOT TYPE {}".format(self.comp.name, self.table.getType(self.comp.name), self.table.getType(self.attr.name)))
                     return False
         except:
             return False
@@ -283,13 +274,10 @@ class Rename:
  
 class Union:
     def __init__(self, expr1, expr2):
-        pass
+        self.expr1=expr1
+        self.expr2=expr2
+        Expr.__init__(self)
         
 class Diff:
     def __init__(self, expr1, expr2):
         pass
-
-
-#Project([Attr('A1'), Attr('A2')], Rel('R1')).validation(['A1', 'A2', 'A3'])
-#Select(Eq(Attr('A1'), Const('AZ')), Rel('R1')).validation(['A1', 'A2'])
-#Select(Eq(Attr('A1'), Const('z')), Select(Eq(Attr('A2'), Const('e')), Rel('R1'))).validation(['A1', 'A2', 'A3', 'A4'])
