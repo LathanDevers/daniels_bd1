@@ -12,7 +12,7 @@ def SPJRUD2sqlite3(pathDB, command):
         command.display()
     c.close()
 
-def Tests():
+def tests():
     tests()
 
 def printTables(pathDB):
