@@ -1,4 +1,5 @@
 from SPJRUD import *
+from misc.Tests import *
 import sqlite3
 
 def SPJRUD2sqlite3(pathDB, command):
@@ -10,6 +11,9 @@ def SPJRUD2sqlite3(pathDB, command):
             command.table.attrs+=[c.execute(retCommand).fetchall()[i]]
         command.display()
     c.close()
+
+def Tests():
+    tests()
 
 def printTables(pathDB):
     c=connexion(pathDB)
@@ -42,7 +46,7 @@ def retAttributes(c, tables):
 def connexion(path):
     conn=sqlite3.connect(path)
     c=conn.cursor()
-    
+    """
     c.execute("drop table R1")
     c.execute('''create table R1(A1 text, A2 real, A3 real)''')
     c.execute("insert into R1 values('Charles', 3, 20)")
@@ -60,7 +64,7 @@ def connexion(path):
     c.execute("insert into R3 values(15, 20, 'BON')")
     c.execute("insert into R3 values(18, 20, 'TRESBON')")
     c.execute("insert into R3 values(3, 20, 'MAUVAIS')")
-    
+    """
     return c
 
 def createTables(c, tables):

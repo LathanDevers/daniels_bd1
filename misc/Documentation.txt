@@ -1,0 +1,92 @@
+#####################################################################################################################
+#FICHIER : SPJRUD.py												    #
+#                                                                                                                   #
+# INDEX:                                                                                                            #
+#                                                                                                                   #
+# CLASSES:                                                                                                          #
+#                                                                                                                   #
+#   Table(self, name="", attrNames=[], attrTypes=[]):                                                               #
+#       name : string                                                                                               #
+#       attrNames : list                                                                                            #
+#       attrTypes : list                                                                                            #
+#       attrs : list                                                                                                #
+#       ---------                                                                                                   #
+#       getType(self, attrName) : string                                                                            #
+#       getPosition(self, attrName) : int                                                                           #
+#       getAttrType(self, position) : string                                                                        #
+#       getAttrName(self, position) : string                                                                        #
+#       setName(self, newName)                                                                                      #
+#       setAttrNames(self, newAttrNames)                                                                            #
+#       setAttrName(self, position, newAttrName)                                                                    #
+#       setAttrTypes(self, newAttrTypes)                                                                            #
+#       setAttrType(self, position, newAttrType)                                                                    #
+#       display(self)                                                                                               #
+#                                                                                                                   #
+#   Expr(self):                                                                                                     #
+#       table : Table                                                                                               #
+#       expression : string                                                                                         #
+#       traduction : string                                                                                         #
+#       ----------                                                                                                  #
+#       setExpression(self, newExpression)                                                                          #
+#       validation(self, tables) : bool                                                                             #
+#       setTraduction(self, newTraduction)                                                                          #
+#       getTraduction(self) : string                                                                                #
+#       display(self)                                                                                               #
+#                                                                                                                   #
+#   Rel(self, relName):Expr                                                                                         #
+#       name : string                                                                                               #
+#       ----                                                                                                        #
+#       validation(self, tables) : bool                                                                             #
+#                                                                                                                   #
+#   Const(self, data):                                                                                              #
+#       data : data                                                                                                 #
+#       atom : string                                                                                               #
+#       ----                                                                                                        #
+#       getType(self) : string                                                                                      #
+#       getTraduction(self) : string                                                                                #
+#                                                                                                                   #
+#   Attr(self, attrName):                                                                                           #
+#       name : string                                                                                               #
+#       atom : string                                                                                               #
+#       ----                                                                                                        #
+#       getTraduction(self) : string                                                                                #
+#                                                                                                                   #
+#   Select(self, attr, comp, expr):Expr                                                                             #
+#       attr : Attr                                                                                                 #
+#       comp : Attr/Const                                                                                           #
+#       expr : Expr                                                                                                 #
+#       ----                                                                                                        #
+#       validation(self, tables) : bool                                                                             #
+#                                                                                                                   #
+#   Project(self, attrs, expr):Expr                                                                                 #
+#       attrs : list                                                                                                #
+#       expr : Expr                                                                                                 #
+#       ----                                                                                                        #
+#       validation(self, tables) : bool                                                                             #
+#                                                                                                                   #
+#   Join(self, expr1, expr2):Expr                                                                                   #
+#       expr1 : Expr                                                                                                #
+#       expr2 : Expr                                                                                                #
+#       ----                                                                                                        #
+#       validation(self, tables) : bool                                                                             #
+#                                                                                                                   #
+#   Rename(self, attrNames1, attrNames2, expr):Expr                                                                 #
+#       attrNames1 : list                                                                                           #
+#       attrNames2 : list                                                                                           #
+#       expr : Expr                                                                                                 #
+#       ----                                                                                                        #
+#       validation(self, tables) : bool                                                                             #
+#                                                                                                                   #
+#   Union(self, expr1, expr2):Expr                                                                                  #
+#       expr1 : Expr                                                                                                #
+#       expr2 : Expr                                                                                                #
+#       ----                                                                                                        #
+#       validation(self, tables) : bool                                                                             #
+#                                                                                                                   #
+#   Diff(self, expr1, expr2):Expr                                                                                   #
+#       expr1 : Expr                                                                                                #
+#       expr2 : Expr                                                                                                #
+#       ----                                                                                                        #
+#       validation(self, tables) : bool                                                                             #
+#                                                                                                                   #
+#####################################################################################################################

@@ -35,6 +35,3 @@ def tests():
     SPJRUD2sqlite3('myDB.db', Diff(Rel('R1'), Rename([Attr('E1')], [Const('A1')], Rel('R3'))))
 
     s=input("press enter to quit...")
-    
-
-tests()

@@ -1,97 +1,8 @@
-########################################################################################################################
-#               FICHIER CONTENANT LES DEFINITIONS DES FONCTIONS UTILISEES DANS LE FICHIER MAIN                         #
-########################################################################################################################
-#
-# INDEX:
-#
-# CLASSES:
-#
-#   Table(self, name="", attrNames=[], attrTypes=[]):
-#       name
-#       attrNames
-#       attrTypes
-#       attrs
-#       ---------
-#       getType(self, attrName)
-#       getPosition(self, attrName)
-#       getAttrType(self, position)
-#       getAttrName(self, position)
-#       setName(self, newName)
-#       setAttrNames(self, newAttrNames)
-#       setAttrName(self, position, newAttrName)
-#       setAttrTypes(self, newAttrTypes)
-#       setAttrType(self, position, newAttrType)
-#       display(self)
-#
-#   Expr(self):
-#       table
-#       expression
-#       traduction
-#       ----------
-#       setExpression(self, newExpression)
-#       setTraduction(self, newTraduction)
-#       getTraduction(self)
-#       display(self)
-#
-#   Rel(self, relName):Expr
-#       name
-#       ----
-#       validation(self, tables)
-#
-#   Const(self, data):
-#       data
-#       atom
-#       ----
-#       getType(self)
-#       getTraduction(self)
-#
-#   Attr(self, attrName):
-#       name
-#       atom
-#       ----
-#       getTraduction(self)
-#
-#   Select(self, attr, comp, expr):Expr
-#       attr
-#       comp
-#       expr
-#       ----
-#       validation(self, tables)
-#
-#   Project(self, attrs, expr):Expr
-#       attrs
-#       expr
-#       ----
-#       validation(self, tables)
-#
-#   Join(self, expr1, expr2):Expr
-#       expr1
-#       expr2
-#       ----
-#       validation(self, tables)
-#
-#   Rename(self, attrNames1, attrNames2, expr):Expr
-#       attrNames1
-#       attrNames2
-#       expr
-#       ----
-#       validation(self, tables)
-#
-#   Union(self, expr1, expr2):Expr
-#       expr1
-#       expr2
-#       ----
-#       validation(self, tables)
-#
-#   Diff(self, expr1, expr2):Expr
-#       expr1
-#       expr2
-#       ----
-#       validation(self, tables)
-#
-#########################################################################################################################
+#####################################################################################################################
+#               FICHIER CONTENANT LES DEFINITIONS DES FONCTIONS UTILISEES DANS LE FICHIER MAIN                      #
+#####################################################################################################################
 
-from Functions import *
+from misc.Functions import *
 
 #TABLE : class Table :
 
@@ -270,7 +181,7 @@ class Project(Expr):
     def validation(self, tables):
         Expr.validation(self, tables)
         if self.expr.validation(tables):
-            tempExpr="Select(["
+            tempExpr="Project(["
             for i in range(len(self.attrs)-1):
                 tempExpr+="{}, ".format(self.attrs[i])
             tempExpr+="{}], {})".format(self.attrs[-1], self.expr)
@@ -407,23 +318,27 @@ class Union(Expr):
         if self.expr1.validation(tables) and self.expr2.validation(tables):
             tempExpr="Union({}, {})".format(self.expr1, self.expr2)
             self.setExpression(tempExpr)
-            for i in range(len(self.expr1.table.attrNames)):
-                if find(self.expr1.table.attrNames[i], self.expr2.table.attrNames) and self.expr1.table.getType(self.expr1.table.attrNames[i])!=self.expr2.table.getType(self.expr1.table.attrNames[i]):
-                    print("ERROR IN UNION SECTION :\n{} :\nATTRIBUTE {} TYPE {} IS NOT {} TYPE {}\n".format(self, self.expr1.table.attrNames[i], self.expr1.table.getType(self.expr1.table.attrNames[i]), self.expr1.table.attrNames[i], self.expr2.table.getType(self.expr1.table.attrNames[i])))
-                    return False
-                elif not(find(self.expr1.table.attrNames[i], self.expr2.table.attrNames)):
-                    print("ERROR IN UNION SECTION :\n{} :\n{} NOT IN {}\n".format(self, self.expr1.table.attrNames, self.expr2.table.attrNames))
-                    return False
-            self.table.setAttrNames(self.expr1.table.attrNames)
-            tempTrad="select "
-            tempTrad+=", ".join(self.table.attrNames)
-            tempTrad1=tempTrad+" from {}".format(self.expr1.getTraduction())
-            tempTrad2=tempTrad+" from {}".format(self.expr2.getTraduction())
-            tempTrad="("+tempTrad1+" union "+tempTrad2+")"
-            self.setTraduction(tempTrad)
-            self.table.setAttrTypes(self.expr1.table.attrTypes)
-            self.table.setName(self.getTraduction()[1:-1])
-            return True
+            if len(self.expr1.table.attrNames)==len(self.expr2.table.attrNames):
+                for i in range(len(self.expr1.table.attrNames)):
+                    if find(self.expr1.table.attrNames[i], self.expr2.table.attrNames) and self.expr1.table.getType(self.expr1.table.attrNames[i])!=self.expr2.table.getType(self.expr1.table.attrNames[i]):
+                        print("ERROR IN UNION SECTION :\n{} :\nATTRIBUTE {} TYPE {} IS NOT {} TYPE {}\n".format(self, self.expr1.table.attrNames[i], self.expr1.table.getType(self.expr1.table.attrNames[i]), self.expr1.table.attrNames[i], self.expr2.table.getType(self.expr1.table.attrNames[i])))
+                        return False
+                    elif not(find(self.expr1.table.attrNames[i], self.expr2.table.attrNames)):
+                        print("ERROR IN UNION SECTION :\n{} :\n{} NOT IN {}\n".format(self, self.expr1.table.attrNames, self.expr2.table.attrNames))
+                        return False
+                self.table.setAttrNames(self.expr1.table.attrNames)
+                tempTrad="select "
+                tempTrad+=", ".join(self.table.attrNames)
+                tempTrad1=tempTrad+" from {}".format(self.expr1.getTraduction())
+                tempTrad2=tempTrad+" from {}".format(self.expr2.getTraduction())
+                tempTrad="("+tempTrad1+" union "+tempTrad2+")"
+                self.setTraduction(tempTrad)
+                self.table.setAttrTypes(self.expr1.table.attrTypes)
+                self.table.setName(self.getTraduction()[1:-1])
+                return True
+            else:
+                print("ERROR IN UNION SECTION :\n{} :\n{} AND {} HAVE DIFFERENTS LENGTH\n".format(self, self.expr1, self.expr2))
+                return False
         else:
             return False
 ########################################################### END CLASS UNION ###########################################################
@@ -438,24 +353,27 @@ class Diff(Expr):
     def validation(self, tables):
         Expr.validation(self, tables)
         if self.expr1.validation(tables) and self.expr2.validation(tables):
-            self.table.setAttrNames(self.expr1.table.attrNames)
             self.setExpression("Diff({}, {})".format(self.expr1, self.expr2))
-            for i in range(len(self.expr1.table.attrNames)):
-                if find(self.expr1.table.attrNames[i], self.expr2.table.attrNames) and self.expr1.table.getType(self.expr1.table.attrNames[i])!=self.expr2.table.getType(self.expr1.table.attrNames[i]):
-                    print("ERROR IN DIFFERENCE SECTION :\n{} :\nATTRIBUTE {} TYPE {} IS NOT {} TYPE {}\n".format(self, self.expr1.table.attrNames[i], self.expr1.table.getType(self.expr1.table.attrNames[i]), self.expr1.table.attrNames[i], self.expr2.table.getType(self.expr1.table.attrNames[i])))
-                    return False
-                elif not(find(self.expr1.table.attrNames[i], self.expr2.table.attrNames)):
-                    print("ERROR IN DIFFERENCE SECTION :\n{} :\n{} NOT IN {}\n".format(self, self.expr1.table.attrNames, self.expr2.table.attrNames))
-                    return False
-            self.table.setAttrTypes(self.expr1.table.attrTypes)
-            tempTrad="select "
-            tempTrad+=", ".join(self.table.attrNames)
-            tempTrad1=tempTrad+" from {}".format(self.expr1.getTraduction())
-            tempTrad2=tempTrad+" from {}".format(self.expr2.getTraduction())
-            tempTrad="("+tempTrad1+" except "+tempTrad2+")"
-            self.setTraduction(tempTrad)
-            self.table.setName(self.getTraduction()[1:-1])
-            return True
+            if len(self.expr1.table.attrNames)==len(self.expr2.table.attrNames):
+                self.table.setAttrNames(self.expr1.table.attrNames)
+                for i in range(len(self.expr1.table.attrNames)):
+                    if find(self.expr1.table.attrNames[i], self.expr2.table.attrNames) and self.expr1.table.getType(self.expr1.table.attrNames[i])!=self.expr2.table.getType(self.expr1.table.attrNames[i]):
+                        print("ERROR IN DIFFERENCE SECTION :\n{} :\nATTRIBUTE {} TYPE {} IS NOT {} TYPE {}\n".format(self, self.expr1.table.attrNames[i], self.expr1.table.getType(self.expr1.table.attrNames[i]), self.expr1.table.attrNames[i], self.expr2.table.getType(self.expr1.table.attrNames[i])))
+                        return False
+                    elif not(find(self.expr1.table.attrNames[i], self.expr2.table.attrNames)):
+                        print("ERROR IN DIFFERENCE SECTION :\n{} :\n{} NOT IN {}\n".format(self, self.expr1.table.attrNames, self.expr2.table.attrNames))
+                        return False
+                self.table.setAttrTypes(self.expr1.table.attrTypes)
+                tempTrad="select "
+                tempTrad+=", ".join(self.table.attrNames)
+                tempTrad1=tempTrad+" from {}".format(self.expr1.getTraduction())
+                tempTrad2=tempTrad+" from {}".format(self.expr2.getTraduction())
+                tempTrad="("+tempTrad1+" except "+tempTrad2+")"
+                self.setTraduction(tempTrad)
+                self.table.setName(self.getTraduction()[1:-1])
+                return True
+            else:
+                print("ERROR IN DIFFERENCE SECTION :\n{} :\n{} AND {} HAVE DIFFERENTS LENGTH\n".format(self, self.expr1, self.expr2))
         else:
             return False
 ########################################################### END CLASS DIFF ###########################################################
