@@ -47,10 +47,12 @@ Comment utiliser ? :
 		Diff(Expr(), Expr()) : Expr() une autre repuete SPJRUD | exemple : Diff(Rel('R1'), Rel('R2'))
 
 	Appliquer une requete SPJRUD sur une base de données :
+		DANS LA CONSOLE PYTHON : from Main import *
 
 		SPJRUD2sqlite3(path, requete) : path : le chemin jusque le fichier base de données, requete : la requete SPJRUD  | exemple : SPJRUD2sqlite3('myDB.db', Select(Attr('A1'), Const('Charles'), Rel('R1')))
 
 
 	Lancer les Tests : 
+		DANS LA CONSOLE PYTHON : from Main import *
 
-		tests()
+		launchTests()
