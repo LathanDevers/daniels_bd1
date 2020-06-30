@@ -1,7 +1,7 @@
 ## Introduction :
 
-	Le but étant d'implémenter un "traducteur" de SPJRUD vers sqlite3 en testant si les requetes étaient correctes,
-il fallait donc définir des classes représentant les différentes expressions de SPJRUD, a savoir le Select, le Project, le Join, le Rename, l'Union et la Difference.
+Le but était d'implémenter un "traducteur" de SPJRUD vers sqlite3 en testant si les requetes étaient correctes.
+Il fallait donc définir des classes représentant les différentes expressions de SPJRUD, a savoir le Select, le Project, le Join, le Rename, l'Union et la Difference.
 Le Select étant toujours attribut=constante ou attribut=attribut, il n'était pas nécéssaire de creer un Eq() dans l'ast.
 Cela posait un probleme, il y avait 3 nouvelles variables(classes) : Attribut, Constante et Relation.
 Un traducteur signifiait une fonction traduction() et une verification nécéssitait une fonction vérification().
