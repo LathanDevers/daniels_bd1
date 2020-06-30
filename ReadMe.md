@@ -61,7 +61,9 @@ from Main import *
 SPJRUD2sqlite3(path, requete)
 ```
 path : le chemin jusque le fichier base de données
+
 requete : la requete SPJRUD
+
 exemple : SPJRUD2sqlite3('myDB.db', Select(Attr('A1'), Const('Charles'), Rel('R1')))
 
 
